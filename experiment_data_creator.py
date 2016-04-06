@@ -54,4 +54,4 @@ for file_item in file_list:
 #     else:
 #         print "not a directory", file
 
-print("Hello, Python!")
+# print("Hello, Python!")
