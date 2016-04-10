@@ -58,18 +58,26 @@ class Stat_Definitions(object):
         return mean_right_diameter
 
 class Participant_Stat(object):
-    def __init__(self, task_means=[], participant=""):
+    def __init__(self, search_types=[], participant=""):
         self.participant = participant
-        self.task_means = task_means
+        self.search_types = search_types
+        
 
-    def addTaskMeans(self, taskMean):
-        self.task_means.append(taskMean)
+class Search_Type(object):
+    def __init__(self, name="", stats=[]):
+        self.name = name
+        self.stats = stats
 
+    def addStats(self, taskMean):
+        self.stats.append(taskMean)
 
 class Stat_Means(object):
-    def __init__(self, mDuration=0.0, mLeft=0.0, mRight=0.0, tType=""):
-        self.mDuration = mDuration
-        self.mLeft = mLeft
-        self.mRight = mRight
+    def __init__(self, mDuration_x=0.0, mLeft_x=0.0, mRight_x=0.0, mDuration_c=0.0, mLeft_c=0.0, mRight_c=0.0, tType=""):
+        self.mDuration_x = mDuration_x
+        self.mLeft_x = mLeft_x
+        self.mRight_x = mRight_x
+        self.mDuration_c = mDuration_c
+        self.mLeft_c = mLeft_c
+        self.mRight_c = mRight_c
         self.tType = tType
         pass
