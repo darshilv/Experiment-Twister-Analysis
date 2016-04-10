@@ -23,10 +23,11 @@ class Experiment_Condition(object):
 
 
 class Stat_Definitions(object):
-    def __init__(self, duration=0.0, dleft=0.0, dright=0.0):
+    def __init__(self, duration=0.0, dleft=0.0, dright=0.0, taskType):
         self.duration = duration
         self.dleft = dleft
         self.dright = dright
+        self.taskType = taskType
         pass
 
     def addDuration(self,dvalue):
@@ -37,6 +38,9 @@ class Stat_Definitions(object):
 
     def addRightDiameter(self,dvalue):
         self.dright = self.dright + dvalue
+
+    def addTaskType(self, taskType):
+        self.taskType = taskType
 
     def calc_mean(self,total_observations):
         print("Mean of gaze duration : " , self.duration/total_observations)
