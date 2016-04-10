@@ -8,7 +8,9 @@ from data_util import change_current_directory, Experiment_Condition, Stat_Defin
 
 # we need to first read calibration data and return values for our screen width variable
 def read_calib_file(participantId):
-    change_current_directory(participantId)
+    # if participantId not in getcwd():
+    #     change_current_directory(participantId)
+
     calib_filename = participantId + "_calib.csv"
     screen_width = 0
     try:
@@ -46,8 +48,7 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
     eStatDefinition = Stat_Definitions()
     cStatDefinition = Stat_Definitions()
     # reading the data file
-    if participantId not in str(getcwd()):
-        change_current_directory(participantId)
+    # print("Current working directory is: " + getcwd())
     
     file_list = listdir(getcwd())
     for filename in file_list:
@@ -64,7 +65,7 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
                         Fixation Point Of Gaze Valid Flag (FPOGV)
                         '''
                         # print(row['BPOGV'])
-                        if int(row['BPOGV']) == 1 and int(row['FPOGV']) == 1 and float(row["TIME"]) >= start_time and float(row["TIME"]) <= end_time:
+                        if int(row['BPOGV']) == 1 and int(row['FPOGV']) == 1:
                             calc_position_x = float(row['BPOGX']) * int(screen_width)
                             # calc_position_y = float(row['BPOGY']) * float(SCREEN_HEIGHT)
                             # if the fixation is valid store the fixation duration
@@ -76,16 +77,30 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
 
                             # print("============" + row['TIME'] + "==========")
                             # print(str(calc_position_x) + "::" + str(calc_position_y))
-                            if calc_position_x >= int(screen_width) / 2:
-                                eCondition.append(Experiment_Condition(calc_position_x,0,fixation_duration, pupil_diam_left, pupil_diam_right))
-                                eStatDefinition.addDuration(fixation_duration)
-                                eStatDefinition.addLeftDiameter(pupil_diam_left)
-                                eStatDefinition.addRightDiameter(pupil_diam_right)
-                            else:
-                                controlCondition.append(Experiment_Condition(calc_position_x,0, fixation_duration, pupil_diam_left, pupil_diam_right))
-                                cStatDefinition.addDuration(fixation_duration)
-                                cStatDefinition.addLeftDiameter(pupil_diam_left)
-                                cStatDefinition.addRightDiameter(pupil_diam_right)
+                            if float(row["TIME"]) >= float(start_time) and float(row["TIME"]) <= float(end_time):
+                                # this data belongs to the task
+                                if calc_position_x >= 700:
+                                    eCondition.append(Experiment_Condition(calc_position_x,0,fixation_duration, pupil_diam_left, pupil_diam_right))
+                                    eStatDefinition.addDuration(fixation_duration)
+                                    eStatDefinition.addLeftDiameter(pupil_diam_left)
+                                    eStatDefinition.addRightDiameter(pupil_diam_right)
+                                else:
+                                    controlCondition.append(Experiment_Condition(calc_position_x,0, fixation_duration, pupil_diam_left, pupil_diam_right))
+                                    cStatDefinition.addDuration(fixation_duration)
+                                    cStatDefinition.addLeftDiameter(pupil_diam_left)
+                                    cStatDefinition.addRightDiameter(pupil_diam_right)
+                            # else
+                            #     # this data is valid but not in any task
+                            #     if calc_position_x >= 700:
+                            #         eCondition.append(Experiment_Condition(calc_position_x,0,fixation_duration, pupil_diam_left, pupil_diam_right))
+                            #         eStatDefinition.addDuration(fixation_duration)
+                            #         eStatDefinition.addLeftDiameter(pupil_diam_left)
+                            #         eStatDefinition.addRightDiameter(pupil_diam_right)
+                            #     else
+                            #         controlCondition.append(Experiment_Condition(calc_position_x,0, fixation_duration, pupil_diam_left, pupil_diam_right))
+                            #         cStatDefinition.addDuration(fixation_duration)
+                            #         cStatDefinition.addLeftDiameter(pupil_diam_left)
+                            #         cStatDefinition.addRightDiameter(pupil_diam_right)
                             # print(row['LPUPILD'] + "::" + row['LPUPILV'] + "||" + row['RPUPILD'] + "::" + row['RPUPILV'] + "--" + row['FPOGD'])
                             valid_idx = valid_idx + 1
                         else:
@@ -93,14 +108,14 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
             except IOError as e:
                 print("Error reading data file")
                 raise e
-    print("Total Valid data points : " + str(valid_idx))
-    print("Total experiment condition : " + str(len(eCondition)))
-    print("Total control condition : " + str(len(controlCondition)))
-    print("===================Means================")
+    # print("Total Valid data points : " + str(valid_idx))
+    # print("Total experiment condition : " + str(len(eCondition)))
+    # print("Total control condition : " + str(len(controlCondition)))
+    # print("===================Means================")
     # depending on the position of the results the experimental and control condition need to be swapped
-    return Stat_Means(eStatDefinition.calc_mean_duration(len(eCondition)), eStatDefinition.calc_mean_left_diameter(len(eCondition)), eStatDefinition.calc_mean_right_diameter(len(eCondition)), cStatDefinition.calc_mean_duration(len(controlCondition)), cStatDefinition.calc_mean_left_diameter(len(controlCondition)), cStatDefinition.calc_mean_right_diameter(len(controlCondition)), task_type)
+    return Stat_Means(eStatDefinition.calc_mean_duration(len(eCondition)), eStatDefinition.calc_mean_left_diameter(len(eCondition)), eStatDefinition.calc_mean_right_diameter(len(eCondition)), cStatDefinition.calc_mean_duration(len(controlCondition)), cStatDefinition.calc_mean_left_diameter(len(controlCondition)), cStatDefinition.calc_mean_right_diameter(len(controlCondition)), task_type, len(eCondition), len(controlCondition), participantId, valid_idx)
 # print (read_calib_file("p1"))
 # read_calib_file("p1")
-print("=====================================SCREEN PARAMETERS SET=====================================")
-output_means = get_stat_means_per_task("p1", 32, 51, 0, read_calib_file("p1"), "N")
-print(output_means.__dict__)
+# print("=====================================SCREEN PARAMETERS SET=====================================")
+# output_means = get_stat_means_per_task("p1", 32, 51, 0, read_calib_file("p1"), "N")
+# print(output_means.__dict__)

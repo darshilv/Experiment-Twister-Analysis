@@ -43,18 +43,30 @@ class Stat_Definitions(object):
         self.dright = self.dright + dvalue
 
     def calc_mean_duration(self,total_observations):
-        mean_duration = self.duration/total_observations
-        print("Mean of gaze duration : " , mean_duration)
+        if total_observations > 0:
+            mean_duration = self.duration/total_observations
+        else:
+            mean_duration = 0
+
+        # print("Mean of gaze duration : " , mean_duration)
         return mean_duration
 
     def calc_mean_left_diameter(self, total_observations):
-        mean_left_diameter = self.dleft/total_observations
-        print("Mean of Left Diameter : " , mean_left_diameter)
+        if total_observations > 0:
+            mean_left_diameter = self.dleft/total_observations
+        else:
+            mean_left_diameter = 0
+
+        # print("Mean of Left Diameter : " , mean_left_diameter)
         return mean_left_diameter
 
     def calc_mean_right_diameter(self, total_observations):
-        mean_right_diameter = self.dright/total_observations
-        print("Mean of Right Diameter : " , mean_right_diameter)
+        if total_observations > 0:
+            mean_right_diameter = self.dright/total_observations
+        else:
+            mean_right_diameter = 0
+        
+        # print("Mean of Right Diameter : " , mean_right_diameter)
         return mean_right_diameter
 
 class Participant_Stat(object):
@@ -72,7 +84,7 @@ class Search_Type(object):
         self.stats.append(taskMean)
 
 class Stat_Means(object):
-    def __init__(self, mDuration_x=0.0, mLeft_x=0.0, mRight_x=0.0, mDuration_c=0.0, mLeft_c=0.0, mRight_c=0.0, tType=""):
+    def __init__(self, mDuration_x=0.0, mLeft_x=0.0, mRight_x=0.0, mDuration_c=0.0, mLeft_c=0.0, mRight_c=0.0, tType="", eObsNum=0, cObsNum=0, participantId="", total_observations=0):
         self.mDuration_x = mDuration_x
         self.mLeft_x = mLeft_x
         self.mRight_x = mRight_x
@@ -80,4 +92,8 @@ class Stat_Means(object):
         self.mLeft_c = mLeft_c
         self.mRight_c = mRight_c
         self.tType = tType
+        self.experimentObservationNumber = eObsNum
+        self.controlObservationNumber = cObsNum
+        self.participantId = participantId
+        self.total_observations = total_observations
         pass
