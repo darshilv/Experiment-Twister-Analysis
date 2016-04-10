@@ -23,12 +23,15 @@ class Experiment_Condition(object):
 
 
 class Stat_Definitions(object):
-    def __init__(self, duration=0.0, dleft=0.0, dright=0.0, taskType):
+    def __init__(self, duration=0.0, dleft=0.0, dright=0.0, taskType=""):
         self.duration = duration
         self.dleft = dleft
         self.dright = dright
         self.taskType = taskType
         pass
+
+    def to_json(self):
+        return "{u'taskType' : %r}" % self.taskType
 
     def addDuration(self,dvalue):
         self.duration = self.duration + dvalue
@@ -39,10 +42,34 @@ class Stat_Definitions(object):
     def addRightDiameter(self,dvalue):
         self.dright = self.dright + dvalue
 
-    def addTaskType(self, taskType):
-        self.taskType = taskType
+    def calc_mean_duration(self,total_observations):
+        mean_duration = self.duration/total_observations
+        print("Mean of gaze duration : " , mean_duration)
+        return mean_duration
 
-    def calc_mean(self,total_observations):
-        print("Mean of gaze duration : " , self.duration/total_observations)
-        print("Mean of Left Diameter : " , self.dleft/total_observations)
-        print("Mean of Right Diameter : " , self.dright/total_observations)
+    def calc_mean_left_diameter(self, total_observations):
+        mean_left_diameter = self.dleft/total_observations
+        print("Mean of Left Diameter : " , mean_left_diameter)
+        return mean_left_diameter
+
+    def calc_mean_right_diameter(self, total_observations):
+        mean_right_diameter = self.dright/total_observations
+        print("Mean of Right Diameter : " , mean_right_diameter)
+        return mean_right_diameter
+
+class Participant_Stat(object):
+    def __init__(self, task_means=[], participant=""):
+        self.participant = participant
+        self.task_means = task_means
+
+    def addTaskMeans(self, taskMean):
+        self.task_means.append(taskMean)
+
+
+class Stat_Means(object):
+    def __init__(self, mDuration=0.0, mLeft=0.0, mRight=0.0, tType=""):
+        self.mDuration = mDuration
+        self.mLeft = mLeft
+        self.mRight = mRight
+        self.tType = tType
+        pass
