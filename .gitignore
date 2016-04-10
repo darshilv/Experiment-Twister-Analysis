@@ -1,5 +1,4 @@
 
 p[0-9]*/*
 task_key_parser.py
-task_key.csv
 __pycache__/data_util.cpython-35.pyc
