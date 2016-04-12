@@ -60,7 +60,7 @@ except IOError as e:
 try:
     chdir(home_directory)
     with open("twister_output.csv", "a") as output_file:
-        key_fieldnames = ["mDuration_x","mLeft_x","mRight_x","mDuration_c","mLeft_c","mRight_c","tType","experimentObservationNumber","controlObservationNumber","participantId", "total_observations"]
+        key_fieldnames = ["mDuration_x","mLeft_x","mRight_x","mDurationCount_x","mLeftCount_x","mRightCount_x","mDuration_c","mLeft_c","mRight_c","mDurationCount_c","mLeftCount_c","mRightCount_c","tType","participantId", "total_observations"]
         writer = csv.DictWriter(output_file, fieldnames=key_fieldnames)
         writer.writeheader()
         for row in output_list:

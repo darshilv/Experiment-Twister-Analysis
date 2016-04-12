@@ -23,52 +23,35 @@ class Experiment_Condition(object):
 
 
 class Stat_Definitions(object):
-    def __init__(self, duration=0.0, dleft=0.0, dright=0.0, taskType=""):
-        self.duration = duration
-        self.dleft = dleft
-        self.dright = dright
-        self.taskType = taskType
-        pass
+    #total count is initialized to 1 simply as the initializing counts as one observation
+    def __init__(self, esum=0.0,csum=0.0, etotal_count=0, ctotal_count=0, isExperiment=False):
+        self.sum_value_experiment = esum
+        self.sum_value_control = csum
+        self.total_count_experiment = etotal_count
+        self.total_count_control = ctotal_count
+        self.experiment_mean = 0
+        self.control_mean = 0
 
-    def to_json(self):
-        return "{u'taskType' : %r}" % self.taskType
+    def update_sum_experiment(self,newValue):
+        self.sum_value_experiment = self.sum_value_experiment + newValue
 
-    def addDuration(self,dvalue):
-        self.duration = self.duration + dvalue
+    def update_sum_control(self,newValue):
+        self.sum_value_control = self.sum_value_control + newValue
 
-    def addLeftDiameter(self,dvalue):
-        self.dleft = self.dleft + dvalue
+    def increment_experiment_counter(self):
+        self.total_count_experiment = self.total_count_experiment + 1
 
-    def addRightDiameter(self,dvalue):
-        self.dright = self.dright + dvalue
-
-    def calc_mean_duration(self,total_observations):
-        if total_observations > 0:
-            mean_duration = self.duration/total_observations
-        else:
-            mean_duration = 0
-
-        # print("Mean of gaze duration : " , mean_duration)
-        return mean_duration
-
-    def calc_mean_left_diameter(self, total_observations):
-        if total_observations > 0:
-            mean_left_diameter = self.dleft/total_observations
-        else:
-            mean_left_diameter = 0
-
-        # print("Mean of Left Diameter : " , mean_left_diameter)
-        return mean_left_diameter
-
-    def calc_mean_right_diameter(self, total_observations):
-        if total_observations > 0:
-            mean_right_diameter = self.dright/total_observations
-        else:
-            mean_right_diameter = 0
+    def increment_control_counter(self):
+        self.total_count_control = self.total_count_control + 1
+    
+    def calc_mean(self):
+        if self.total_count_experiment > 0:
+            self.experiment_mean = self.sum_value_experiment/self.total_count_experiment
         
-        # print("Mean of Right Diameter : " , mean_right_diameter)
-        return mean_right_diameter
+        if self.total_count_control > 0:
+            self.control_mean = self.sum_value_control / self.total_count_control
 
+    
 class Participant_Stat(object):
     def __init__(self, search_types=[], participant=""):
         self.participant = participant
@@ -84,16 +67,20 @@ class Search_Type(object):
         self.stats.append(taskMean)
 
 class Stat_Means(object):
-    def __init__(self, mDuration_x=0.0, mLeft_x=0.0, mRight_x=0.0, mDuration_c=0.0, mLeft_c=0.0, mRight_c=0.0, tType="", eObsNum=0, cObsNum=0, participantId="", total_observations=0):
-        self.mDuration_x = mDuration_x
-        self.mLeft_x = mLeft_x
-        self.mRight_x = mRight_x
-        self.mDuration_c = mDuration_c
-        self.mLeft_c = mLeft_c
-        self.mRight_c = mRight_c
+    def __init__(self, fixation, pupil_left, pupil_right, tType="", participantId="", total_observations=0):
+        self.mDuration_x = fixation.experiment_mean
+        self.mLeft_x = pupil_left.experiment_mean
+        self.mRight_x = pupil_right.experiment_mean
+        self.mDurationCount_x = fixation.total_count_experiment
+        self.mLeftCount_x = pupil_left.total_count_experiment
+        self.mRightCount_x = pupil_right.total_count_experiment
+        self.mDuration_c = fixation.control_mean
+        self.mLeft_c = pupil_left.control_mean
+        self.mRight_c = pupil_right.control_mean
+        self.mDurationCount_c = fixation.total_count_control
+        self.mLeftCount_c = pupil_left.total_count_control
+        self.mRightCount_c = pupil_right.total_count_control
         self.tType = tType
-        self.experimentObservationNumber = eObsNum
-        self.controlObservationNumber = cObsNum
         self.participantId = participantId
         self.total_observations = total_observations
         pass

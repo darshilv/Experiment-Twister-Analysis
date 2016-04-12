@@ -40,13 +40,12 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
     #initializing variables
     valid_idx = 0
     
-    #creating arrays to store relevant data as objects
-    eCondition = []
-    controlCondition = []
-
     #creating stat calculation object
-    eStatDefinition = Stat_Definitions()
-    cStatDefinition = Stat_Definitions()
+    #initialize experiment + control variables
+    fixation = Stat_Definitions()
+    pupil_diameter_left = Stat_Definitions()
+    pupil_diameter_right = Stat_Definitions()
+
     # reading the data file
     # print("Current working directory is: " + getcwd())
     
@@ -58,50 +57,57 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
                     csv_reader = csv.DictReader(data_file)
                     data_header = csv_reader.fieldnames
                     # print(data_header)
+
                     for row in csv_reader:
                         '''
                         considering only valid data points based on
                         Best Point Of Gaze Valid Flag (BPOGV)
                         Fixation Point Of Gaze Valid Flag (FPOGV)
                         '''
-                        # print(row['BPOGV'])
-                        if int(row['BPOGV']) == 1 and int(row['FPOGV']) == 1:
+                        if int(row['BPOGV']) == 1:
                             calc_position_x = float(row['BPOGX']) * int(screen_width)
+                            # we dont need the Y position as the regions of interest are divided horizontally
                             # calc_position_y = float(row['BPOGY']) * float(SCREEN_HEIGHT)
-                            # if the fixation is valid store the fixation duration
-                            fixation_duration = float(row['FPOGD'])
-                            pupil_diam_left = float(row['LPUPILD'])
-                            pupil_diam_right = float(row['RPUPILD'])
-                            # print(str(calc_position_x) + "::" + str(calc_position_y) + "::" + str(calc_duration))
-                            # print(row['BPOGX'] + "::" + row['BPOGY'] + "::" + row["FPOGD"] + "::" + row["FPOGV"])
-
-                            # print("============" + row['TIME'] + "==========")
-                            # print(str(calc_position_x) + "::" + str(calc_position_y))
+                            
                             if float(row["TIME"]) >= float(start_time) and float(row["TIME"]) <= float(end_time):
-                                # this data belongs to the task
+
+                                #identify if the observation is in experiment or control region
+                                #if x coordinate value is greater than 700 it is in the experiment region
                                 if calc_position_x >= 700:
-                                    eCondition.append(Experiment_Condition(calc_position_x,0,fixation_duration, pupil_diam_left, pupil_diam_right))
-                                    eStatDefinition.addDuration(fixation_duration)
-                                    eStatDefinition.addLeftDiameter(pupil_diam_left)
-                                    eStatDefinition.addRightDiameter(pupil_diam_right)
+                                    # if the fixation is valid store the fixation duration
+                                    if int(row['FPOGV']) == 1:
+                                        fixation.update_sum_experiment(float(row['FPOGD']))
+                                        fixation.increment_experiment_counter()
+                                    
+                                    #if the Left Pupil Diameter is valid we store that
+                                    if int(row[LPUPILV]) > 0:
+                                        pupil_diameter_left.update_sum_experiment(float(row['LPUPILD']))
+                                        pupil_diameter_left.increment_experiment_counter()
+
+                                    #if the right pupil diameter is valid we store that
+                                    if int(row[RPUPILV]) > 0:
+                                        pupil_diameter_right.update_sum_experiment(float(row['RPUPILD']))
+                                        pupil_diameter_right.increment_experiment_counter()
                                 else:
-                                    controlCondition.append(Experiment_Condition(calc_position_x,0, fixation_duration, pupil_diam_left, pupil_diam_right))
-                                    cStatDefinition.addDuration(fixation_duration)
-                                    cStatDefinition.addLeftDiameter(pupil_diam_left)
-                                    cStatDefinition.addRightDiameter(pupil_diam_right)
-                            # else
-                            #     # this data is valid but not in any task
-                            #     if calc_position_x >= 700:
-                            #         eCondition.append(Experiment_Condition(calc_position_x,0,fixation_duration, pupil_diam_left, pupil_diam_right))
-                            #         eStatDefinition.addDuration(fixation_duration)
-                            #         eStatDefinition.addLeftDiameter(pupil_diam_left)
-                            #         eStatDefinition.addRightDiameter(pupil_diam_right)
-                            #     else
-                            #         controlCondition.append(Experiment_Condition(calc_position_x,0, fixation_duration, pupil_diam_left, pupil_diam_right))
-                            #         cStatDefinition.addDuration(fixation_duration)
-                            #         cStatDefinition.addLeftDiameter(pupil_diam_left)
-                            #         cStatDefinition.addRightDiameter(pupil_diam_right)
-                            # print(row['LPUPILD'] + "::" + row['LPUPILV'] + "||" + row['RPUPILD'] + "::" + row['RPUPILV'] + "--" + row['FPOGD'])
+                                    # if the fixation is valid store the fixation duration
+                                    if int(row['FPOGV']) == 1:
+                                        fixation.update_sum_control(float(row['FPOGD']))
+                                        fixation.increment_control_counter()
+                                    
+                                    #if the Left Pupil Diameter is valid we store that
+                                    if int(row[LPUPILV]) > 0:
+                                        pupil_diameter_left.update_sum_control(float(row['LPUPILD']))
+                                        pupil_diameter_left.increment_control_counter()
+
+                                    #if the right pupil diameter is valid we store that
+                                    if int(row[RPUPILV]) > 0:
+                                        pupil_diameter_right.update_sum_control(float(row['RPUPILD']))
+                                        pupil_diameter_right.increment_control_counter()
+
+                            #calculate means for all
+                            fixation.calc_mean()
+                            pupil_diameter_right.calc_mean()
+                            pupil_diameter_left.calc_mean()
                             valid_idx = valid_idx + 1
                         else:
                             pass
@@ -113,7 +119,7 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
     # print("Total control condition : " + str(len(controlCondition)))
     # print("===================Means================")
     # depending on the position of the results the experimental and control condition need to be swapped
-    return Stat_Means(eStatDefinition.calc_mean_duration(len(eCondition)), eStatDefinition.calc_mean_left_diameter(len(eCondition)), eStatDefinition.calc_mean_right_diameter(len(eCondition)), cStatDefinition.calc_mean_duration(len(controlCondition)), cStatDefinition.calc_mean_left_diameter(len(controlCondition)), cStatDefinition.calc_mean_right_diameter(len(controlCondition)), task_type, len(eCondition), len(controlCondition), participantId, valid_idx)
+    return Stat_Means(fixation.experiment_mean, fixation.total_count_experiment, pupil_diameter_left.experiment_mean, pupil_diameter_right.experiment_mean, fixation.control_mean, pupil_diameter_left.control_mean, pupil_diameter_right.control_mean, task_type, participantId, valid_idx)
 # print (read_calib_file("p1"))
 # read_calib_file("p1")
 # print("=====================================SCREEN PARAMETERS SET=====================================")
