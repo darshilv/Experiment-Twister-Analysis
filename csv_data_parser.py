@@ -80,12 +80,12 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
                                         fixation.increment_experiment_counter()
                                     
                                     #if the Left Pupil Diameter is valid we store that
-                                    if int(row[LPUPILV]) > 0:
+                                    if int(row['LPUPILV']) > 0:
                                         pupil_diameter_left.update_sum_experiment(float(row['LPUPILD']))
                                         pupil_diameter_left.increment_experiment_counter()
 
                                     #if the right pupil diameter is valid we store that
-                                    if int(row[RPUPILV]) > 0:
+                                    if int(row['RPUPILV']) > 0:
                                         pupil_diameter_right.update_sum_experiment(float(row['RPUPILD']))
                                         pupil_diameter_right.increment_experiment_counter()
                                 else:
@@ -95,12 +95,12 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
                                         fixation.increment_control_counter()
                                     
                                     #if the Left Pupil Diameter is valid we store that
-                                    if int(row[LPUPILV]) > 0:
+                                    if int(row['LPUPILV']) > 0:
                                         pupil_diameter_left.update_sum_control(float(row['LPUPILD']))
                                         pupil_diameter_left.increment_control_counter()
 
                                     #if the right pupil diameter is valid we store that
-                                    if int(row[RPUPILV]) > 0:
+                                    if int(row['RPUPILV']) > 0:
                                         pupil_diameter_right.update_sum_control(float(row['RPUPILD']))
                                         pupil_diameter_right.increment_control_counter()
 
@@ -119,7 +119,7 @@ def get_stat_means_per_task(participantId, start_time, end_time, search_pos, scr
     # print("Total control condition : " + str(len(controlCondition)))
     # print("===================Means================")
     # depending on the position of the results the experimental and control condition need to be swapped
-    return Stat_Means(fixation.experiment_mean, fixation.total_count_experiment, pupil_diameter_left.experiment_mean, pupil_diameter_right.experiment_mean, fixation.control_mean, pupil_diameter_left.control_mean, pupil_diameter_right.control_mean, task_type, participantId, valid_idx)
+    return Stat_Means(fixation, pupil_diameter_left, pupil_diameter_right, task_type, participantId, valid_idx)
 # print (read_calib_file("p1"))
 # read_calib_file("p1")
 # print("=====================================SCREEN PARAMETERS SET=====================================")
