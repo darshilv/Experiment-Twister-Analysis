@@ -68,13 +68,13 @@ class Search_Type(object):
 
 class Stat_Means(object):
     def __init__(self, fixation, pupil_left, pupil_right, tType="", participantId="", total_observations=0):
-        self.mDuration_x = fixation.experiment_mean
+        self.mDuration_x = fixation.sum_value_experiment
         self.mLeft_x = pupil_left.experiment_mean
         self.mRight_x = pupil_right.experiment_mean
         self.mDurationCount_x = fixation.total_count_experiment
         self.mLeftCount_x = pupil_left.total_count_experiment
         self.mRightCount_x = pupil_right.total_count_experiment
-        self.mDuration_c = fixation.control_mean
+        self.mDuration_c = fixation.sum_value_control
         self.mLeft_c = pupil_left.control_mean
         self.mRight_c = pupil_right.control_mean
         self.mDurationCount_c = fixation.total_count_control
